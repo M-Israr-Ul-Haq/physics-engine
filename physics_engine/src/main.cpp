@@ -8,9 +8,9 @@ int main()
     window.setFramerateLimit(60);
 
     std::vector<Particles> particles;
-    for (int i = 0; i < 3; i++) {
-        float x = 100.f + (i % 3) * 100.f;    //  columns
-        float y = 100.f + (i / 3) * 100.f;    //  rows
+    for (int i = 0; i < 100; i++) {
+        float x = 100.f + (i % 10) * 100.f;    //  columns
+        float y = 100.f + (i / 10) * 100.f;    //  rows
         float m = 1.0f;
         Particles p(x, y, m);
         p.Initialize(); 

@@ -152,11 +152,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Particles.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Particles.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Particles.h" />
+    <ClInclude Include="src\Particles.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
