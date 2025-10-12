@@ -4,13 +4,15 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode({ 800, 600 }), "Physics Engine");
+    const sf::Vector2f maxSize(800.f, 600.f);
+    const sf::Vector2f minSize(0.f, 0.f);
+    sf::RenderWindow window(sf::VideoMode({ static_cast<unsigned int>( maxSize.x), static_cast<unsigned int>( maxSize.y) }), "Physics Engine");
     window.setFramerateLimit(60);
 
     std::vector<Particles> particles;
-    for (int i = 0; i < 100; i++) {
-        float x = 100.f + (i % 10) * 100.f;    //  columns
-        float y = 100.f + (i / 10) * 100.f;    //  rows
+    for (int i = 0; i < 10; i++) {
+        float x = 100.f + (i % 5) * 100.f;    //  columns
+        float y = 100.f + (i / 5) * 100.f;    //  rows
         float m = 1.0f;
         Particles p(x, y, m);
         p.Initialize(); 
@@ -45,7 +47,7 @@ int main()
 
         // Update all particles
         for (auto& p : particles) {
-            p.Update(fixedDt);  // Call member function
+            p.Update(fixedDt, maxSize, minSize);  // Call member function
         }
 
         // Render
