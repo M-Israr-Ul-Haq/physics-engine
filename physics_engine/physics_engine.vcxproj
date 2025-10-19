@@ -152,11 +152,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\physicsWorld\Collision.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Particles.cpp" />
+    <ClCompile Include="src\physicsWorld\Particle.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Particles.h" />
+    <ClInclude Include="src\physicsWorld\Collision.h" />
+    <ClInclude Include="src\physicsWorld\Particle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
