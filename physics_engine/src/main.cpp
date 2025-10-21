@@ -24,7 +24,7 @@ int main()
 
     // Create multiple particles
     std::vector<Particle> particles;
-    const int numParticles = 100;
+    const int numParticles = 10;
 
     for (size_t i = 0; i < numParticles; i++)
     {
@@ -66,7 +66,51 @@ int main()
             {
                 if (Collision::checkParticleCollision(particles[i], particles[j]))
                 {
+                    std::cout << "Before collision:\n";
+                    std::cout << "  p1 angleV = " << particles[i].getAngleV() << "\n";
+                    std::cout << "  p2 angleV = " << particles[j].getAngleV() << "\n";
+
+                    // Compute total linear momentum and kinetic energy BEFORE collision
+                    sf::Vector2f pBefore(0.f, 0.f);
+                    float keBefore = 0.f;
+                    for (auto& p : particles)
+                    {
+                        float m = p.getMass();
+                        float r = p.shape.getRadius();
+                        float v2 = p.Velocity.x * p.Velocity.x + p.Velocity.y * p.Velocity.y;
+                        float I = 0.5f * m * r * r;
+                        float w2 = p.getAngleV() * p.getAngleV();
+                        pBefore += p.Velocity * m;
+                        keBefore += 0.5f * m * v2 + 0.5f * I * w2;
+                    }
+
+                    // Resolve collision
                     Collision::resolveParticleCollision(particles[i], particles[j]);
+
+                    // Compute total linear momentum and kinetic energy AFTER collision
+                    sf::Vector2f pAfter(0.f, 0.f);
+                    float keAfter = 0.f;
+                    for (auto& p : particles)
+                    {
+                        float m = p.getMass();
+                        float r = p.shape.getRadius();
+                        float v2 = p.Velocity.x * p.Velocity.x + p.Velocity.y * p.Velocity.y;
+                        float I = 0.5f * m * r * r;
+                        float w2 = p.getAngleV() * p.getAngleV();
+                        pAfter += p.Velocity * m;
+                        keAfter += 0.5f * m * v2 + 0.5f * I * w2;
+                    }
+
+                    // Output
+                    std::cout << "After collision:\n";
+                    std::cout << "  p1 angleV = " << particles[i].getAngleV() << "\n";
+                    std::cout << "  p2 angleV = " << particles[j].getAngleV() << "\n";
+
+                    std::cout << "Total momentum change: ("
+                        << pAfter.x - pBefore.x << ", " << pAfter.y - pBefore.y << ")\n";
+                    std::cout << "Total KE change: "
+                        << keAfter - keBefore << "\n";
+                    std::cout << "Energy is not preserved -> intentional due to friction clamping and numerical integration." << "\n\n";
                 }
             }
         }

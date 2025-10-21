@@ -5,7 +5,7 @@
 
 // -------------Constructor / Destructor----------------
 Particle::Particle(float x, float y, float m)
-    : Position(x, y), Velocity(0.f, 0.f), mass(m), angleA( 0.0f ), angleV(0.0f)
+    : Position(x, y), Velocity(0.f, 0.f), mass(m), angleV(0.0f), Rotation(0.0f)
 {
 }
 
@@ -16,8 +16,8 @@ Particle::~Particle()
 // -------------Initialization----------------
 void Particle::Initialize()
 {
-    shape.setRadius(15.f);
-    shape.setOrigin(sf::Vector2f(15.f, 15.f));
+    shape.setRadius(20.f);
+    shape.setOrigin(sf::Vector2f(20.f, 20.f));
     shape.setPosition(Position);
 
     // Set random color
@@ -31,14 +31,15 @@ void Particle::Initialize()
 
     // Setting the axis of the particles
     const float width = shape.getRadius();
-    const float height = 2.0f;
-
+    const float height = 1.0f;
     axis.setSize(sf::Vector2f(width, height));
     axis.setPosition(shape.getPosition());
+    axis.setOrigin(sf::Vector2f{ width / 2.f, height / 2.f });
     axis.setFillColor(sf::Color::Black);
 
-    // Set random velocity on initialization
+    // Set random velocity & angular velocity on initialization
     setRandomVelocity();
+    setRandomAngularVelocity(-5.0f, 5.0f);
 }
 
 void Particle::Load()
@@ -46,18 +47,22 @@ void Particle::Load()
     // (empty for now)
 }
 
-// -------------Continuous Collision Detection Update----------------
+// -------------Update----------------
 void Particle::Update(float dt, const sf::Vector2f& maxSize, const sf::Vector2f& minSize)
 {
+    Rotation += angleV * dt;
+    angleV *= 0.65f;
+
     // Resolve the collision with walls
     Collision::resolveWallCollision(*this, dt, maxSize, minSize);
 
-    // Spin the particles
-    Collision::spinningParticles(*this);
-
-    // Update shape & axis position 
+    // Update shape position and rotation
     shape.setPosition(Position);
+    shape.setRotation(sf::radians(Rotation));
+
+    // Update axis position and rotation
     axis.setPosition(Position);
+    axis.setRotation(sf::radians(Rotation));
 }
 
 // ---------------Random Velocity Initialization---------------------
@@ -73,6 +78,17 @@ void Particle::setRandomVelocity(float minSpeed, float maxSpeed)
 
     Velocity.x = speed * cos(angle);
     Velocity.y = speed * sin(angle);
+}
+
+// ---------------Random Angular Velocity Initialization---------------------
+void Particle::setRandomAngularVelocity(float minSpin, float maxSpin)
+{
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> spinDist(minSpin, maxSpin);
+
+    angleV = spinDist(gen);     // radians per second
+    Rotation = 0.0f;            // Start at 0 rotation
 }
 
 // -----------------Drawing-------------------

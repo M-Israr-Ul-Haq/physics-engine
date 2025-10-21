@@ -28,50 +28,95 @@ bool Collision::checkWallCollision(const sf::Vector2f& position, float radius, c
 	return (position.x - radius <= minSize.x || position.x + radius >= maxSize.x || position.y - radius <= minSize.y || position.y + radius >= maxSize.y);
 }
 
-//--------------- resolving collisions ---------------
+//--------------- resolving Particle collisions ---------------
 void Collision::resolveParticleCollision(Particle& p1, Particle& p2)
 {
+    float r1 = p1.shape.getRadius();
+    float r2 = p2.shape.getRadius();
     float dist = distance(p1.Position, p2.Position);
-    float radiusSum = p1.shape.getRadius() + p2.shape.getRadius();
+    float radiusSum = r1 + r2;
 
-    // Early exit if not overlapping
+    // Exit if not overlapping
     if (dist >= radiusSum) return;
 
-    // Handle near-zero distance case
+    // Near-zero distance case
     sf::Vector2f d = p1.Position - p2.Position;
     if (dist < 1e-6f) {
         d = sf::Vector2f(1.0f, 0.0f);
         dist = radiusSum;
     }
 
-    // Normalized direction vector
+    // Normalized direction vectors
     sf::Vector2f normal = d / dist;
+    sf::Vector2f tangent(-normal.y, normal.x);
 
     // Relative velocity
     sf::Vector2f v = p1.Velocity - p2.Velocity;
-    float vDotN = dotProduct(v, normal);
+
+    // Normal velocity (approach speed)
+    float v_n = dotProduct(v, normal);
 
     // Only resolve if moving toward each other
-    if (vDotN >= 0.0f) return;
+    if (v_n >= 0.0f) return;
 
-    // Elastic collision response
-    float mSum = p1.getMass() + p2.getMass();
-    float impulse = (2.0f * vDotN) / mSum;
+    // --- PHASE 1: NORMAL IMPULSE (Bouncing) ---
 
-    p1.Velocity -= impulse * p2.getMass() * normal;
-    p2.Velocity += impulse * p1.getMass() * normal;
+    float m1 = p1.getMass();
+    float m2 = p2.getMass();
+    float restitution = 1.0f;  // Perfectly elastic
 
-    // Separate overlapping particles with epsilon
+    // Normal impulse 
+    float J_n = -(1.0f + restitution) * v_n / (1.0f / m1 + 1.0f / m2);
+
+    // Apply normal impulse
+    p1.Velocity += (J_n / m1) * normal;
+    p2.Velocity -= (J_n / m2) * normal;
+
+    // --- PHASE 2: TANGENTIAL IMPULSE (Friction & Spin) ---
+
+    // Tangential velocity (sliding speed at contact)
+    float v_t = dotProduct(v, tangent)
+        + p1.getAngleV() * r1
+        - p2.getAngleV() * r2;
+
+    // Moment of inertia (solid circles)
+    float I1 = 0.5f * m1 * r1 * r1;
+    float I2 = 0.5f * m2 * r2 * r2;
+
+    // Effective mass for tangential motion
+    float invMt = (1.0f / m1) + (1.0f / m2) + (r1 * r1) / I1 + (r2 * r2) / I2;
+
+    // Tangential impulse (to eliminate sliding)
+    float J_t = -v_t / invMt;
+
+     // Clamp by friction coefficient
+     float mu = 0.5f;  // Friction coefficient
+     J_t = std::clamp(J_t, -mu * std::abs(J_n), mu * std::abs(J_n));
+
+    // Apply tangential impulse to linear velocities
+    p1.Velocity += (J_t / m1) * tangent;
+    p2.Velocity -= (J_t / m2) * tangent;
+
+    // Apply tangential impulse to angular velocities
+    p1.getAngleV() += (r1 * J_t) / I1;
+    p2.getAngleV() -= (r2 * J_t) / I2;
+
+    // --- POSITIONAL CORRECTION (Prevent sinking) ---
+
     const float epsilon = 0.001f;
     float overlap = radiusSum - dist;
     sf::Vector2f correction = normal * (overlap / 2.0f + epsilon);
-    
-    p1.shape.move(correction);
-    p2.shape.move(-correction);
+
+    // Update positions
+    p1.Position += correction;
+    p2.Position -= correction;
+
+    // Sync visual shapes
     p1.shape.setPosition(p1.Position);
     p2.shape.setPosition(p2.Position);
 }
 
+//--------------- resolving Wall collisions ---------------
 void Collision::resolveWallCollision(Particle& particle,float dt, const sf::Vector2f& maxSize, const sf::Vector2f& minSize)
 {
     float radius = particle.shape.getRadius();
@@ -82,17 +127,17 @@ void Collision::resolveWallCollision(Particle& particle,float dt, const sf::Vect
     {
         // ---- Collision occurs within this frame ----
 
-        // 2. Move up to the collision point
+        // 1. Move up to the collision point
         particle.Position += particle.Velocity * (tc * dt);
 
-        // 3. Reflect velocity depending on which boundary was hit
+        // 2. Reflect velocity depending on which boundary was hit
         if (particle.Position.x - radius <= minSize.x || particle.Position.x + radius >= maxSize.x)
             particle.Velocity.x = -particle.Velocity.x * restitution;
 
         if (particle.Position.y - radius <= minSize.y || particle.Position.y + radius >= maxSize.y)
             particle.Velocity.y = -particle.Velocity.y * restitution;
 
-        // 4. Move remaining time after the bounce
+        // 3. Move remaining time after the bounce
         float remaining = 1.0f - tc;
         particle.Position += particle.Velocity * (remaining * dt);
     }
@@ -101,6 +146,14 @@ void Collision::resolveWallCollision(Particle& particle,float dt, const sf::Vect
         // ---- No collision this frame ----
         particle.Position += particle.Velocity * dt;
     }
+
+    // ----------------------- CORNER FIX -----------------------
+    // Clamp particle inside the box after all movement
+    particle.Position.x = std::clamp(particle.Position.x, minSize.x + radius, maxSize.x - radius);
+    particle.Position.y = std::clamp(particle.Position.y, minSize.y + radius, maxSize.y - radius);
+
+    // Sync visual shape
+    particle.shape.setPosition(particle.Position);
 }
 
 // ---------- Calculating Compute Time Of Impact ----------
@@ -144,23 +197,4 @@ float Collision::computeTOI(const sf::Vector2f& position, const sf::Vector2f& ve
 		considerCandidate(tBottom);
 	}
 	return tc; // -1 if no collision this frame, otherwise 0 ≤ tc ≤ 1
-}
-
-//--------------- SPIN the particles ---------------
-void Collision::spinningParticles(Particle& particle)
-{
-    sf::Angle angle = sf::degrees(1.0f);
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> dist(-0.5f, 0.5f);
-
-    particle.setAngleA(dist(gen));       // optional, or use to accelerate spin
-
-    // accumulate angle and velocity
-    angle += sf::degrees(particle.getAngleV());
-    particle.getAngleV() += particle.getAngleA();
-
-    particle.shape.rotate(particle.getAngleV() * angle );
-    particle.axis.rotate(particle.getAngleV() * angle );
 }

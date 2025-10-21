@@ -21,7 +21,4 @@ public:
     static float computeTOI(const sf::Vector2f& position, const sf::Vector2f& velocity,
         float radius, float dt, const sf::Vector2f& maxSize,
         const sf::Vector2f& minSize);
-
-    // Spinning the particles
-    static void spinningParticles(Particle& particle);
 };
