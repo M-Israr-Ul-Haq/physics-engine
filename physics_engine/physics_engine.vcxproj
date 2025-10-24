@@ -152,13 +152,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\physicsWorld\Collision.cpp" />
+    <ClCompile Include="src\Orbital_Chaos\OrbitalChaosApp.cpp" />
+    <ClCompile Include="src\Atomic_Chaos\AtomicChaosApp.cpp" />
+    <ClCompile Include="src\Orbital_Chaos\GravityRenderer.cpp" />
+    <ClCompile Include="src\Orbital_Chaos\FragmentationSystem.cpp" />
+    <ClCompile Include="src\Orbital_Chaos\CelestialBody.cpp" />
+    <ClCompile Include="src\Orbital_Chaos\PhysicsWorld.cpp" />
+    <ClCompile Include="src\Atomic_Chaos\Collision.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\physicsWorld\Particle.cpp" />
+    <ClCompile Include="src\Atomic_Chaos\Particle.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\physicsWorld\Collision.h" />
-    <ClInclude Include="src\physicsWorld\Particle.h" />
+    <ClInclude Include="src\Orbital_Chaos\OrbitalChaosApp.h" />
+    <ClInclude Include="src\Atomic_Chaos\AtomicChaosApp.h" />
+    <ClInclude Include="src\Orbital_Chaos\GravityRenderer.h" />
+    <ClInclude Include="src\Orbital_Chaos\FragmentationSystem.h" />
+    <ClInclude Include="src\Orbital_Chaos\CelestialBody.h" />
+    <ClInclude Include="src\Orbital_Chaos\PhysicsWorld.h" />
+    <ClInclude Include="src\Atomic_Chaos\Collision.h" />
+    <ClInclude Include="src\Atomic_Chaos\Particle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

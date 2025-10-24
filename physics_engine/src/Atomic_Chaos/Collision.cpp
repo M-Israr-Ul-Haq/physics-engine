@@ -85,9 +85,10 @@ void Collision::resolveParticleCollision(Particle& p1, Particle& p2)
 
     // Effective mass for tangential motion
     float invMt = (1.0f / m1) + (1.0f / m2) + (r1 * r1) / I1 + (r2 * r2) / I2;
+    float mEff_t = 1.0f / invMt;
 
     // Tangential impulse (to eliminate sliding)
-    float J_t = -v_t / invMt;
+    float J_t = -v_t * mEff_t;
 
      // Clamp by friction coefficient
      float mu = 0.5f;  // Friction coefficient
@@ -196,5 +197,5 @@ float Collision::computeTOI(const sf::Vector2f& position, const sf::Vector2f& ve
 		float tBottom = (maxSize.y - radius - position.y) / (velocity.y * dt);
 		considerCandidate(tBottom);
 	}
-	return tc; // -1 if no collision this frame, otherwise 0 ≤ tc ≤ 1
+	return tc; // -1 if no collision this frame, otherwise 0 <= tc <= 1
 }

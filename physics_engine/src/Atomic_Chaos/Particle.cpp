@@ -16,8 +16,8 @@ Particle::~Particle()
 // -------------Initialization----------------
 void Particle::Initialize()
 {
-    shape.setRadius(20.f);
-    shape.setOrigin(sf::Vector2f(20.f, 20.f));
+    shape.setRadius(5.f);
+    shape.setOrigin(sf::Vector2f(5.f, 5.f));
     shape.setPosition(Position);
 
     // Set random color
@@ -51,7 +51,7 @@ void Particle::Load()
 void Particle::Update(float dt, const sf::Vector2f& maxSize, const sf::Vector2f& minSize)
 {
     Rotation += angleV * dt;
-    angleV *= 0.65f;
+    angleV *= 0.99f;
 
     // Resolve the collision with walls
     Collision::resolveWallCollision(*this, dt, maxSize, minSize);
