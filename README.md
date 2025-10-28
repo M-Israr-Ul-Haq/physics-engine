@@ -1,8 +1,5 @@
 # ⚛️ Physics Engine  
 *A lightweight 2D physics simulation engine built with C++ and SFML 3.0.*
-
-![Atomic Chaos Demo](assets/atomic_chaos_demo.gif)
-
 ---
 
 ## 🧩 Overview
@@ -18,7 +15,10 @@ It’s designed for **learning, experimentation, and visualization** — perfect
 - **Spin dynamics** and **angular momentum transfer**  
 - **Continuous Collision Detection (CCD)** — prevents tunneling for fast-moving particles  
 - **Damping** for realistic energy dissipation  
-- Robust **boundary collision handling**, including screen corners  
+- Robust **boundary collision handling**, including screen corners
+- --
+ ![Atomic Chaos Demo](physics_engine/assets/atomic_chaos_demo.gif)
+
 
 ### 🌍 Planetary Motion *(In Development)*
 - Gravitational interactions between celestial bodies  
