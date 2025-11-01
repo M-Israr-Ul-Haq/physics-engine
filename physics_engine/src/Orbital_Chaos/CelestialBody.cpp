@@ -1,81 +1,31 @@
 #include "CelestialBody.h"
+#include <iostream>
 
-void CelestialBody::createPlanet(float m, float r, sf::Vector2f pos, sf::Vector2f vel)
+GravitySource::GravitySource(sf::Vector2f pos, float m) 
+    : position(pos), mass(m)  
 {
-    Object planet;
-    planet.mass = m;
-    planet.radius = r;
-    planet.position = pos;
-    planet.velocity = vel;
-    planet.acceleration = { 0.f, 0.f };
-
-    auto circle = std::make_shared<sf::CircleShape>(r);
-    circle->setOrigin({ r, r });
-    circle->setPosition(pos);
-    circle->setFillColor(sf::Color::Red);
-    planet.shape = circle;
-
-    planets.emplace_back(planet);
+    sun.setPosition(pos);
+    sun.setOrigin(sf::Vector2f{ 15.f, 15.f });  
+    sun.setFillColor(sf::Color::Yellow);  
+    sun.setRadius(15.f);
 }
 
-void CelestialBody::createMeteor(float m, float r, sf::Vector2f pos, sf::Vector2f vel)
+void GravitySource::render(sf::RenderWindow& window)
 {
-    Object meteor;
-    meteor.mass = m;
-    meteor.radius = r;
-    meteor.position = pos;
-    meteor.velocity = vel;
-    meteor.acceleration = { 0.f, 0.f };
-
-    auto rect = std::make_shared<sf::RectangleShape>(sf::Vector2f{ r * 2, r * 2 });
-    rect->setOrigin({ r, r });
-    rect->setPosition(pos);
-    rect->setFillColor(sf::Color::White);
-    meteor.shape = rect;
-
-    meteors.emplace_back(meteor);
+    window.draw(sun);
 }
 
-void CelestialBody::createStar(float r, sf::Vector2f pos)
+Planets::Planets(sf::Vector2f pos, sf::Vector2f vel)
+    : position(pos), velocity(vel), mass(1.0f)  
 {
-    Object star;
-    star.mass = 0.f;  // Stars don't participate in physics
-    star.radius = r;
-    star.position = pos;
-    star.velocity = { 0.f, 0.f };
-    star.acceleration = { 0.f, 0.f };
-
-    auto circle = std::make_shared<sf::CircleShape>(r);
-    circle->setOrigin({ r, r});
-    circle->setPosition(pos);
-    circle->setFillColor(sf::Color::Yellow);
-    star.shape = circle;
-
-    stars.emplace_back(star);
+    planet.setFillColor(sf::Color::Blue);
+    planet.setRadius(8.f);
+    planet.setOrigin(sf::Vector2f{ 8.f, 8.f });  // CRITICAL: center the origin!
+    planet.setPosition(position);
 }
 
-void CelestialBody::update(float dt)
+void Planets::render(sf::RenderWindow& window)
 {
-    for (auto& p : planets) {
-        p.velocity += p.acceleration * dt;
-        p.position += p.velocity * dt;
-        p.shape->setPosition(p.position);
-    }
-
-    for (auto& m : meteors) {
-        m.velocity += m.acceleration * dt;
-        m.position += m.velocity * dt;
-        m.shape->setPosition(m.position);
-    }
-}
-
-void CelestialBody::draw(sf::RenderWindow& window)
-{
-    for (auto& p : planets)
-        window.draw(*p.shape);
-
-    for (auto& m : meteors)
-        window.draw(*m.shape);
-    for (auto& s : stars)
-        window.draw(*s.shape);
+    planet.setPosition(position);
+    window.draw(planet);
 }
