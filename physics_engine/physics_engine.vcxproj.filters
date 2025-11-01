@@ -30,12 +30,6 @@
     <ClCompile Include="src\Orbital_Chaos\CelestialBody.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orbital_Chaos\FragmentationSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Orbital_Chaos\GravityRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Atomic_Chaos\AtomicChaosApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -54,12 +48,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Orbital_Chaos\CelestialBody.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Orbital_Chaos\FragmentationSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Orbital_Chaos\GravityRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Atomic_Chaos\AtomicChaosApp.h">
