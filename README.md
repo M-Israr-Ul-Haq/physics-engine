@@ -23,8 +23,9 @@ It’s designed for **learning, experimentation, and visualization** — perfect
 ### 🌍 Planetary Motion *(In Development)*
 - Gravitational interactions between celestial bodies  
 - Orbital mechanics simulation based on Newtonian gravity  
-- Configurable body masses, velocities, and gravitational constants  
-
+- Configurable body masses, velocities, and gravitational constants
+-   *(In developement)*
+ ![Orbital Chaos Demo](physics_engine/assets/orbital_chaos_demo.gif)
 ---
 
 ## 🧰 Getting Started
