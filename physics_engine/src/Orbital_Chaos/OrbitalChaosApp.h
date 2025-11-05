@@ -11,26 +11,28 @@ private:
     sf::Vector2f minSize;
     sf::RenderWindow window;
 
-    GravitySource sun;
-    std::vector<Planets> planets;
+    // Sun + planets stored together
+    std::vector<CelestialBody> bodies;
 
-    // Orbital trails for each planet
+    // Orbital trails (only for planets, not sun)
     std::vector<std::deque<sf::Vector2f>> orbital_trails;
-    const size_t MAX_TRAIL_LENGTH = 500;  
+
+    const size_t MAX_TRAIL_LENGTH = 500;
     int trail_update_counter = 0;
-    const int TRAIL_UPDATE_INTERVAL = 3;  
+    const int TRAIL_UPDATE_INTERVAL = 3;
 
     PhysicsWorld physics_world;
 
 public:
     OrbitalChaosApp();
     ~OrbitalChaosApp();
+
     void initialize();
     void run();
     void cleanup();
 
 private:
-    void setup_planets();
+    void setup_bodies();   // renamed from setup_planets
     void update_trails();
     void render_trails();
 };

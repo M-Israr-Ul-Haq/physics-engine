@@ -1,25 +1,31 @@
 #include "OrbitalChaosApp.h"
 #include "PhysicsWorld.h"
+
 #include <random>
 #include <iostream>
 #include <cmath>
 
 OrbitalChaosApp::OrbitalChaosApp()
-    : maxSize(1200.f, 900.f),  
-    minSize(0.f, 0.f),
-    sun(sf::Vector2f(600.f, 450.f), 10000.f)  
+    : maxSize(1200.f, 900.f),
+    minSize(0.f, 0.f)
 {
-    setup_planets();
+    setup_bodies();
 }
 
-OrbitalChaosApp::~OrbitalChaosApp()
-{
-}
+OrbitalChaosApp::~OrbitalChaosApp() {}
 
-void OrbitalChaosApp::setup_planets()
+void OrbitalChaosApp::setup_bodies()
 {
-    // Planetary data: radius from sun, relative size, color
-    // Scaled to fit in 1200x900 window (position of sun 600, 450)
+    // ---- Sun ----
+    CelestialBody sun({ 400.f, 450.f }, { 0.f, 0.f });
+    sun.set_mass(10000.f);
+    sun.set_color(sf::Color::Yellow);
+    sun.set_radius(15.f);
+
+    bodies.push_back(sun);
+    orbital_trails.push_back({});
+
+    // ---- Planet data ----
     struct PlanetData {
         std::string name;
         float orbital_radius;
@@ -28,40 +34,38 @@ void OrbitalChaosApp::setup_planets()
     };
 
     std::vector<PlanetData> planet_data = {
-        {"Mercury", 50.f,  3.f,  sf::Color(169, 169, 169)},      
-        {"Venus",   70.f,  5.f,  sf::Color(255, 198, 73)},     
-        {"Earth",   95.f,  6.f,  sf::Color(30, 144, 255)},     
-        {"Mars",    125.f, 4.5f, sf::Color(205, 92, 92)},      
-        {"Jupiter", 180.f, 14.f, sf::Color(216, 202, 157)},    
-        {"Saturn",  240.f, 12.f, sf::Color(238, 215, 137)},    
-        {"Uranus",  300.f, 9.f,  sf::Color(79, 208, 231)},     
-        {"Neptune", 360.f, 9.f,  sf::Color(72, 101, 255)}      
+    {"Mercury",  90.f,  3.f * 2.5f,  sf::Color(169, 169, 169)},  // 7.5px
+    {"Venus",   140.f,  5.f * 2.5f,  sf::Color(255, 198, 73)},   // 12.5px
+    {"Earth",   200.f,  6.f * 2.5f,  sf::Color(30, 144, 255)},   // 15px
+    {"Mars",    270.f,  4.5f * 2.5f, sf::Color(205, 92, 92)},    // 11.25px
+    {"Jupiter", 380.f, 14.f * 2.5f,  sf::Color(216, 202, 157)},  // 35px
+    {"Saturn",  500.f, 12.f * 2.5f,  sf::Color(238, 215, 137)},  // 30px
+    {"Uranus",  640.f,  9.f * 2.5f,  sf::Color(79, 208, 231)},   // 22.5px
+    {"Neptune", 780.f,  9.f * 2.5f,  sf::Color(72, 101, 255)}    // 22.5px
     };
 
-    sf::Vector2f sun_pos = sun.get_position();
-    float sun_mass = sun.get_mass();
+    sf::Vector2f sun_pos = bodies[0].get_position();
+    float sun_mass = bodies[0].get_mass();
 
-    // Create each planet
-    for (const auto& data : planet_data) {
-        // Positioned planets to the right of sun
+    for (const auto& data : planet_data)
+    {
+        // Position from sun
         sf::Vector2f planet_pos(sun_pos.x + data.orbital_radius, sun_pos.y);
 
         // Circular orbit velocity
-        float v_circular = std::sqrt(PhysicsConstants::G * sun_mass / data.orbital_radius);
+        float v_circ = std::sqrt(PhysicsConstants::G * sun_mass / data.orbital_radius);
 
-        // Set velocity perpendicular to radius 
-        sf::Vector2f planet_vel(0.f, v_circular);
+        // Perpendicular velocity
+        float eccentricity = 0.3f;
+        sf::Vector2f vel(0.f, v_circ* (1.0f - eccentricity));
 
-        // Create planet
-        Planets planet(planet_pos, planet_vel);
-        planet.set_mass(1.0f);  // Mass doesn't affect orbit in this simulation
-        planet.set_color(data.color);
-        planet.set_radius(data.planet_size);
+        CelestialBody p(planet_pos, vel);
+        p.set_mass(1.f);
+        p.set_color(data.color);
+        p.set_radius(data.planet_size);
 
-        planets.push_back(planet);
-
-        // Initialize empty trail for this planet
-        orbital_trails.push_back(std::deque<sf::Vector2f>());
+        bodies.push_back(p);
+        orbital_trails.push_back({});
     }
 }
 
@@ -70,9 +74,9 @@ void OrbitalChaosApp::initialize()
     sf::ContextSettings settings;
     settings.antiAliasingLevel = 8;
 
-    window.create(sf::VideoMode({ static_cast<unsigned int>(maxSize.x),
-                                  static_cast<unsigned int>(maxSize.y) }),
-        "Solar System Simulation - All Planets");
+    window = sf::RenderWindow(sf::VideoMode( { static_cast<unsigned>(maxSize.x), static_cast<unsigned>(maxSize.y) }), "N-Body Orbital Simulation"
+    );
+
     window.setFramerateLimit(60);
 }
 
@@ -80,44 +84,43 @@ void OrbitalChaosApp::update_trails()
 {
     trail_update_counter++;
 
-    // Update trails every N frames to avoid overcrowding
-    if (trail_update_counter >= TRAIL_UPDATE_INTERVAL) {
+    if (trail_update_counter >= TRAIL_UPDATE_INTERVAL)
+    {
         trail_update_counter = 0;
 
-        for (size_t i = 0; i < planets.size(); ++i) {
-            orbital_trails[i].push_back(planets[i].get_position());
+        for (size_t i = 0; i < bodies.size(); ++i)
+        {
+            orbital_trails[i].push_back(bodies[i].get_position());
 
-            // Remove old trail points if too long
-            if (orbital_trails[i].size() > MAX_TRAIL_LENGTH) {
+            if (orbital_trails[i].size() > MAX_TRAIL_LENGTH)
                 orbital_trails[i].pop_front();
-            }
         }
     }
 }
 
 void OrbitalChaosApp::render_trails()
 {
-    for (size_t i = 0; i < orbital_trails.size(); ++i) {
+    for (size_t i = 0; i < orbital_trails.size(); ++i)
+    {
         const auto& trail = orbital_trails[i];
 
         if (trail.size() < 2) continue;
 
-        // Get planet color for trail
-        sf::Color planet_color = planets[i].get_color();
+        sf::Color base = bodies[i].get_color();
 
-        // Draw trail points as small circles
-        for (size_t j = 0; j < trail.size(); ++j) {
-            // Fade older trail points
-            float alpha_factor = static_cast<float>(j) / static_cast<float>(trail.size());
-            sf::Color trail_color = planet_color;
-            trail_color.a = static_cast<std::uint8_t>(80 * alpha_factor);
+        for (size_t j = 0; j < trail.size(); ++j)
+        {
+            float t = (float)j / trail.size();
 
-            sf::CircleShape trail_point(1.5f);  // Small circle for trail
-            trail_point.setPosition(trail[j]);
-            trail_point.setOrigin(sf::Vector2f{ 1.5f, 1.5f });
-            trail_point.setFillColor(trail_color);
+            sf::Color c = base;
+            c.a = (uint8_t)(80 * t);
 
-            window.draw(trail_point);
+            sf::CircleShape dot(1.5f);
+            dot.setOrigin({ 1.5f, 1.5f });
+            dot.setFillColor(c);
+            dot.setPosition(trail[j]);
+
+            window.draw(dot);
         }
     }
 }
@@ -126,52 +129,36 @@ void OrbitalChaosApp::run()
 {
     sf::Clock clock;
 
-    // Physics sub step configuration
-    const int PHYSICS_SUBSTEPS = 10;
-    const float TIME_SCALE = 5.0f;  // Adjust orbit speed
+    const int   PHYSICS_SUBSTEPS = 30;
+    const float TIME_SCALE = 2.0f;
 
     while (window.isOpen())
     {
-        // Event handling
+        // Handle events
         while (auto eventOpt = window.pollEvent())
         {
             if (eventOpt->is<sf::Event::Closed>())
                 window.close();
-
-            // Press SPACE to clear trails
-            if (eventOpt->is<sf::Event::KeyPressed>()) {
-                if (eventOpt->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Space) {
-                    for (auto& trail : orbital_trails) {
-                        trail.clear();
-                    }
-                }
-            }
         }
 
-        // Get frame time
         float frame_dt = clock.restart().asSeconds();
         if (frame_dt > 0.25f) frame_dt = 0.25f;
 
-        // Physics update with substeps
-        float physics_dt = (frame_dt * TIME_SCALE) / static_cast<float>(PHYSICS_SUBSTEPS);
+        float physics_dt = (frame_dt * TIME_SCALE) / (float)PHYSICS_SUBSTEPS;
 
-        for (int i = 0; i < PHYSICS_SUBSTEPS; ++i) {
-            for (auto& planet : planets) {
-                physics_world.update_planet_physics(planet, sun, physics_dt);
-            }
+        for (int n = 0; n < PHYSICS_SUBSTEPS; ++n)
+        {
+            physics_world.update_physics(bodies, physics_dt);
         }
 
         update_trails();
+
         window.clear(sf::Color::Black);
 
-        // Draw trails first (behind planets)
         render_trails();
 
-        sun.render(window);
-        // Draw all planets
-        for (auto& planet : planets) {
-            planet.render(window);
-        }
+        for (auto& b : bodies)
+            b.render(window);
 
         window.display();
     }
@@ -181,5 +168,6 @@ void OrbitalChaosApp::cleanup()
 {
     if (window.isOpen())
         window.close();
-    std::cout << "Resources released successfully!" << std::endl;
+
+    std::cout << "Simulation exited cleanly.\n";
 }

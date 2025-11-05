@@ -9,5 +9,5 @@ namespace PhysicsConstants {
 class PhysicsWorld
 {
 public:
-    void update_planet_physics(Planets& planet, const GravitySource& source, float dt);
+    void update_physics(std::vector<CelestialBody>& bodies, float dt);
 };
