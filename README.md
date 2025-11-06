@@ -20,11 +20,13 @@ It’s designed for **learning, experimentation, and visualization** — perfect
  ![Atomic Chaos Demo](physics_engine/assets/atomic_chaos_demo.gif)
 
 
-### 🌍 Planetary Motion *(In Development)*
-- Gravitational interactions between celestial bodies  
-- Orbital mechanics simulation based on Newtonian gravity  
-- Configurable body masses, velocities, and gravitational constants
--   *(In developement)*
+### 🌍 Planetary Motion (2D → 3D Migration)
+* N-body gravitational simulation with elliptical Keplerian orbits
+* Vis-viva equation implementation for realistic orbital dynamics
+* Real-time visualization with orbital trails and diagnostic output
+* Eight planets with configurable masses, velocities, and eccentricities
+* Physics substep integration (40 steps/frame) for accuracy
+* Currently 2D (SFML) - transitioning to 3D simulation next
  ![Orbital Chaos Demo](physics_engine/assets/orbital_chaos_demo.gif)
 ---
 
@@ -64,5 +66,5 @@ physics-engine/
 ```
 ---
 ## ⚖️ License
-This is a personal project created for learning and experimentation. 
-Feel free to contribute :)
+This is a personal learning project created for experimentation and exploration. 
+Contributions and suggestions are welcome! :)
