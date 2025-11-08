@@ -36,6 +36,12 @@
     <ClCompile Include="src\Orbital_Chaos\OrbitalChaosApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Pendulum_Chaos\DoublePendulum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Pendulum_Chaos\PendulumChaosApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Atomic_Chaos\Particle.h">
@@ -54,6 +60,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Orbital_Chaos\OrbitalChaosApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Pendulum_Chaos\DoublePendulum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Pendulum_Chaos\PendulumChaosApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -152,6 +152,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Pendulum_Chaos\PendulumChaosApp.cpp" />
+    <ClCompile Include="src\Pendulum_Chaos\DoublePendulum.cpp" />
     <ClCompile Include="src\Orbital_Chaos\OrbitalChaosApp.cpp" />
     <ClCompile Include="src\Atomic_Chaos\AtomicChaosApp.cpp" />
     <ClCompile Include="src\Orbital_Chaos\CelestialBody.cpp" />
@@ -161,6 +163,8 @@
     <ClCompile Include="src\Atomic_Chaos\Particle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Pendulum_Chaos\PendulumChaosApp.h" />
+    <ClInclude Include="src\Pendulum_Chaos\DoublePendulum.h" />
     <ClInclude Include="src\Orbital_Chaos\OrbitalChaosApp.h" />
     <ClInclude Include="src\Atomic_Chaos\AtomicChaosApp.h" />
     <ClInclude Include="src\Orbital_Chaos\CelestialBody.h" />

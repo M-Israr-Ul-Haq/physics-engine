@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Atomic_Chaos/AtomicChaosApp.h"
 #include "Orbital_Chaos/OrbitalChaosApp.h"
+#include "Pendulum_Chaos/PendulumChaosApp.h"
 
 bool getIntInput(int& val) {
     std::cin >> val;
@@ -22,8 +23,9 @@ int main()
         cout << "\n=== 2D Physics Engine ===\n";
         cout << "1. Atomic Chaos (Particle Collision)\n";
         cout << "2. Orbital Chaos (Gravity Simulation)\n";
-        cout << "3. Exit \n";
-        cout << "Choose simulation : ";
+        cout << "3. Pendulum Chaos (Double Pendulum)\n";
+        cout << "4. Exit \n";
+        cout << "Select a  simulation : ";
 
         if (!getIntInput(choice)) continue;
 
@@ -43,7 +45,14 @@ int main()
             break;
         }
         case 3: {
-            cout << "\nThis Was 2D Physics Simulation - Thanks :)" << endl;
+            PendulumChaosApp app;
+            app.initialize();
+            app.run();
+            app.cleanup();
+            break;
+        }
+        case 4: {
+            cout << "\nThis Was 2D Physics Simulation - Controls coming soon!" << endl;
             break;
         }
         default: {
@@ -51,6 +60,6 @@ int main()
             break;
             }
         }
-    } while (choice != 3);
+    } while (choice != 4);
     return 0;
 }
