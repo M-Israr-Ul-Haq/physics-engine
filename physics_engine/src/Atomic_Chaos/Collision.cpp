@@ -1,4 +1,8 @@
 ﻿#include <cmath>
+#include <algorithm>
+#include <cmath>
+#include <algorithm>
+#include <cmath>
 #include <random>
 #include "Collision.h"
 #include "Particle.h"

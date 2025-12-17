@@ -1,6 +1,6 @@
 ﻿#include <random>
 #include <math.h>
-#include "particle.h"
+#include "Particle.h"
 #include "Collision.h"
 
 // -------------Constructor / Destructor----------------

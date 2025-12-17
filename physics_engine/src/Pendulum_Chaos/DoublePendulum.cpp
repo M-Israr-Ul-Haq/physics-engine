@@ -1,4 +1,6 @@
 #include "DoublePendulum.h"
+#include <cmath>
+#include <cmath>
 
 void DoublePendulum::initialize() {
     // Initialize lengths, masses, angles
